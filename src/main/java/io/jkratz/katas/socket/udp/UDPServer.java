@@ -19,17 +19,19 @@ public class UDPServer implements Runnable {
     @Override
     public void run() {
 
+        // Flag as running
         this.running.set(true);
 
+        // While running wait for message from client and respond
         while (this.running.get()) {
-            try (DatagramSocket socket = new DatagramSocket(5000)) {
 
+            try {
                 // Create buffer and packet to receive data
                 byte[] buffer = new byte[256];
                 DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
                 // Waits for a packet to come in and fills the buffer with the data, THIS IS BLOCKING!
-                socket.receive(packet);
+                this.socket.receive(packet);
 
                 // Get the ip address and port of the client
                 InetAddress address = packet.getAddress();
@@ -44,12 +46,12 @@ public class UDPServer implements Runnable {
                 DatagramPacket responsePacket = new DatagramPacket(response.getBytes(), response.getBytes().length, address, port);
                 socket.send(responsePacket);
             } catch (IOException ex) {
-                // If something should go wrong let's just print the exception
-                System.out.println(ex);
+                ex.printStackTrace();
             }
         }
 
-
+        // If we reach this point server is no longer running, close the socket
+        this.socket.close();
     }
 
     public void stop() {
