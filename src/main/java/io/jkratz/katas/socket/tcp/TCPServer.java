@@ -19,7 +19,8 @@ public class TCPServer {
     public void start() throws IOException {
         this.serverSocket = new ServerSocket(this.port);
         while (true) {
-            new Thread(new ClientHandler(this.serverSocket.accept())).start();
+            ClientHandler handler = new ClientHandler(this.serverSocket.accept());
+            new Thread(handler).start();
         }
     }
 

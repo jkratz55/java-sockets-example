@@ -4,6 +4,7 @@ import org.junit.*;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.concurrent.Executors;
 
 public class TCPTest {
 
@@ -11,9 +12,18 @@ public class TCPTest {
     private TCPClient client;
 
     @Before
-    public void setup() throws IOException {
+    public void setup() throws IOException, InterruptedException {
+
         this.server = new TCPServer(5000);
-        this.server.start();
+        Executors.newSingleThreadExecutor()
+                .submit(() -> {
+                    try {
+                        this.server.start();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+        Thread.sleep(2000);
 
         this.client = new TCPClient(InetAddress.getByName("localhost"), 5000);
     }
